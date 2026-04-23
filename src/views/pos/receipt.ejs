@@ -1,0 +1,143 @@
+<%
+  title = mode === 'final' ? 'Receipt' : 'Checkout'
+%>
+
+<div class="max-w-4xl mx-auto py-8 px-4">
+
+  <!-- Header -->
+  <div class="flex items-center gap-4 mb-6">
+    <% if (mode === 'preview') { %>
+      <a href="/pos" class="btn btn-ghost btn-sm gap-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to POS
+      </a>
+    <% } %>
+    <div>
+      <h1 class="text-2xl font-bold">
+        <%= mode === 'final' ? 'Transaction Receipt' : 'Checkout Summary' %>
+      </h1>
+      <% if (mode === 'final' && order) { %>
+        <p class="text-base-content/60 text-sm mt-0.5">
+          Order #<%= order.id %> &mdash;
+          <%= new Date(order.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %>
+        </p>
+      <% } %>
+    </div>
+  </div>
+
+  <% if (error) { %>
+    <div class="alert alert-error alert-soft mb-4">
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <!-- Itemized table -->
+  <div class="card bg-base-100 shadow-sm mb-6">
+    <div class="overflow-x-auto">
+      <table class="table table-zebra">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Category</th>
+            <th class="text-right">Qty</th>
+            <th class="text-right">Unit Price</th>
+            <th class="text-right">Subtotal</th>
+            <th>Discount</th>
+            <th class="text-right">Net Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (const line of lineItems) { %>
+            <tr>
+              <td>
+                <p class="font-medium"><%= line.name %></p>
+                <p class="font-mono text-xs text-base-content/50"><%= line.sku %></p>
+              </td>
+              <td><span class="badge badge-outline badge-sm"><%= line.category %></span></td>
+              <td class="text-right font-mono"><%= line.quantity %></td>
+              <td class="text-right"><%= formatCurrency(line.unitPrice) %></td>
+              <td class="text-right"><%= formatCurrency(line.subtotal) %></td>
+              <td>
+                <% if (line.discountRate > 0) { %>
+                  <span class="badge badge-soft badge-success badge-sm"><%= (line.discountRate * 100).toFixed(0) %>%</span>
+                  <p class="text-xs text-base-content/50 mt-0.5"><%= line.discountRule %></p>
+                  <p class="text-xs text-error">−<%= formatCurrency(line.discountAmount) %></p>
+                <% } else { %>
+                  <span class="text-base-content/40 text-sm">—</span>
+                <% } %>
+              </td>
+              <td class="text-right font-semibold"><%= formatCurrency(line.netAmount) %></td>
+            </tr>
+          <% } %>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="6" class="text-right text-base-content/60">Total Net</td>
+            <td class="text-right font-semibold"><%= formatCurrency(totalNet) %></td>
+          </tr>
+          <tr>
+            <td colspan="6" class="text-right text-base-content/60">PPN 11%</td>
+            <td class="text-right"><%= formatCurrency(taxAmount) %></td>
+          </tr>
+          <tr class="bg-primary/10">
+            <td colspan="6" class="text-right font-bold text-lg">Grand Total</td>
+            <td class="text-right font-bold text-lg text-primary"><%= formatCurrency(grandTotal) %></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Payment section (preview mode) -->
+  <% if (mode === 'preview') { %>
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title text-base">Payment</h2>
+        <form action="/pos/checkout" method="POST" class="flex gap-3 items-end">
+          <div class="flex flex-col gap-1 flex-1">
+            <label class="label">
+              <span class="label-text">Amount Tendered (Rp)</span>
+            </label>
+            <input type="number" name="payment" min="<%= roundedGrandTotal %>" step="1000"
+              class="input input-bordered" placeholder="Enter payment amount" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Complete Sale</button>
+        </form>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Payment result (final mode) -->
+  <% if (mode === 'final') { %>
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body gap-4">
+        <h2 class="card-title text-base">Payment Summary</h2>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="stat bg-base-200 rounded-box p-4">
+            <p class="stat-title text-xs">Grand Total</p>
+            <p class="stat-value text-lg"><%= formatCurrency(grandTotal) %></p>
+          </div>
+          <div class="stat bg-base-200 rounded-box p-4">
+            <p class="stat-title text-xs">Amount Tendered</p>
+            <p class="stat-value text-lg"><%= formatCurrency(payment) %></p>
+          </div>
+        </div>
+        <div class="alert alert-success alert-soft">
+          <div>
+            <p class="font-semibold">Change</p>
+            <p class="text-2xl font-bold"><%= formatCurrency(change) %></p>
+          </div>
+        </div>
+        <div class="flex gap-3 mt-2">
+          <form action="/pos/cart/clear" method="POST" class="flex-1">
+            <button type="submit" class="btn btn-primary w-full">New Transaction</button>
+          </form>
+          <a href="/pos/history" class="btn btn-outline flex-1">View Order History</a>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
+</div>

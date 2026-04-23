@@ -1,0 +1,120 @@
+<% title = 'Character Matcher' %>
+
+<div class="max-w-2xl mx-auto py-8">
+
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold">Character Matcher</h1>
+    <p class="text-base-content/60 text-sm mt-1">
+      Find what percentage of characters from Input 1 appear in Input 2.
+    </p>
+  </div>
+
+  <div class="card bg-base-100 shadow-sm mb-6">
+    <div class="card-body gap-4">
+      <form action="/character" method="POST" class="flex flex-col gap-4">
+
+        <div class="flex flex-col gap-1">
+          <label class="label"><span class="label-text font-medium">Input 1</span></label>
+          <input
+            type="text"
+            name="input1"
+            class="input input-bordered font-mono"
+            placeholder="e.g. ABBCD"
+            value="<%= result ? result.input1 : '' %>"
+            required
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="label"><span class="label-text font-medium">Input 2</span></label>
+          <input
+            type="text"
+            name="input2"
+            class="input input-bordered font-mono"
+            placeholder="e.g. Gallant Duck"
+            value="<%= result ? result.input2 : '' %>"
+            required
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="label"><span class="label-text font-medium">Match Type</span></label>
+          <div class="flex gap-4">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="type"
+                value="sensitive"
+                class="radio radio-primary"
+                <%= (!result || result.type === 'sensitive') ? 'checked' : '' %>
+              />
+              <span>Case Sensitive</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="type"
+                value="insensitive"
+                class="radio radio-primary"
+                <%= (result && result.type === 'insensitive') ? 'checked' : '' %>
+              />
+              <span>Case Insensitive</span>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-full">Calculate Match</button>
+
+      </form>
+    </div>
+  </div>
+
+  <% if (result) { %>
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body gap-4">
+        <h2 class="card-title">Result</h2>
+
+        <div class="flex items-center justify-center py-6">
+          <div class="radial-progress text-primary text-2xl font-bold"
+            style="--value:<%= result.percentage %>; --size: 8rem; --thickness: 8px;">
+            <%= result.percentage %>%
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <div class="bg-base-200 rounded-xl p-3">
+            <p class="text-base-content/50 text-xs mb-1">Input 1 length</p>
+            <p class="font-bold text-lg"><%= result.totalChars %> chars</p>
+          </div>
+          <div class="bg-base-200 rounded-xl p-3">
+            <p class="text-base-content/50 text-xs mb-1">Unique matches</p>
+            <p class="font-bold text-lg"><%= result.matchedChars.length %> chars</p>
+          </div>
+        </div>
+
+        <% if (result.matchedChars.length > 0) { %>
+          <div>
+            <p class="text-sm text-base-content/60 mb-2">Matched characters:</p>
+            <div class="flex gap-2 flex-wrap">
+              <% for (const char of result.matchedChars) { %>
+                <span class="kbd kbd-sm font-mono"><%= char === ' ' ? 'SPACE' : char %></span>
+              <% } %>
+            </div>
+          </div>
+        <% } else { %>
+          <div class="alert alert-warning">
+            <span>No characters from Input 1 were found in Input 2.</span>
+          </div>
+        <% } %>
+
+        <div class="text-xs text-base-content/40 border-t border-base-200 pt-3">
+          Mode: <span class="font-medium"><%= result.type === 'sensitive' ? 'Case Sensitive' : 'Case Insensitive' %></span>
+          &nbsp;•&nbsp;
+          Formula: <%= result.matchedChars.length %> / <%= result.totalChars %> × 100 = <%= result.percentage %>%
+        </div>
+
+      </div>
+    </div>
+  <% } %>
+
+</div>

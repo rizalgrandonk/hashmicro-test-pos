@@ -1,0 +1,138 @@
+<%
+  title = 'Discount Management'
+  const successParam = locals.query && locals.query.success
+%>
+
+<div class="py-8 px-4">
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold">Discount Management</h1>
+      <p class="text-base-content/60 text-sm mt-0.5"><%= discounts.length %> discount rules</p>
+    </div>
+    <a href="/pos" class="btn btn-outline btn-sm">Go to POS</a>
+  </div>
+
+  <% if (error) { %>
+    <div class="alert alert-error alert-soft mb-4"><span><%= error %></span></div>
+  <% } %>
+  <% if (locals.query && locals.query.success) { %>
+    <div class="alert alert-success alert-soft mb-4"><span>Discount created successfully.</span></div>
+  <% } %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Create form -->
+    <div class="card bg-base-100 shadow-sm h-fit">
+      <div class="card-body">
+        <h2 class="card-title text-base mb-1">Add Discount Rule</h2>
+        <form action="/discounts" method="POST" class="flex flex-col gap-3">
+
+          <div class="flex flex-col gap-1">
+            <label class="label"><span class="label-text">Product</span></label>
+            <select name="productId" class="select select-bordered" required>
+              <option value="" disabled selected>Select a product…</option>
+              <% for (const p of products) { %>
+                <option value="<%= p.id %>"><%= p.name %> (<%= p.sku %>)</option>
+              <% } %>
+            </select>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="label"><span class="label-text">Label</span></label>
+            <input type="text" name="label" class="input input-bordered"
+              placeholder="e.g. Bulk Buy (5+ pcs)" required />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div class="flex flex-col gap-1">
+              <label class="label"><span class="label-text">Min Qty</span></label>
+              <input type="number" name="minQuantity" class="input input-bordered"
+                value="1" min="1" required />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="label"><span class="label-text">Rate (0–1)</span></label>
+              <input type="number" name="rate" class="input input-bordered"
+                placeholder="e.g. 0.10" step="0.01" min="0.01" max="0.99" required />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="label">
+              <span class="label-text">Min Subtotal (Rp)</span>
+              <span class="label-text-alt text-base-content/40">optional</span>
+            </label>
+            <input type="number" name="minSubtotal" class="input input-bordered"
+              value="0" min="0" step="1000" />
+          </div>
+
+          <p class="text-xs text-base-content/40">
+            Rate is a decimal — enter <strong>0.10</strong> for 10% off.
+            Rules are evaluated in order; the last matching rule wins.
+          </p>
+
+          <button type="submit" class="btn btn-primary w-full mt-1">Add Rule</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Discount list -->
+    <div class="lg:col-span-2">
+      <% if (discounts.length === 0) { %>
+        <div class="card bg-base-100 shadow-sm">
+          <div class="card-body items-center text-center py-16 text-base-content/40">
+            <p>No discount rules yet. Add one using the form.</p>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="card bg-base-100 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="table table-zebra">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Label</th>
+                  <th class="text-right">Min Qty</th>
+                  <th class="text-right">Min Subtotal</th>
+                  <th class="text-right">Rate</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (const d of discounts) { %>
+                  <tr>
+                    <td>
+                      <p class="font-medium text-sm"><%= d.product.name %></p>
+                      <p class="font-mono text-xs text-base-content/40"><%= d.product.sku %></p>
+                    </td>
+                    <td class="text-sm"><%= d.label %></td>
+                    <td class="text-right font-mono text-sm"><%= d.minQuantity %></td>
+                    <td class="text-right text-sm">
+                      <% if (d.minSubtotal > 0) { %>
+                        <%= formatCurrency(d.minSubtotal) %>
+                      <% } else { %>
+                        <span class="text-base-content/30">—</span>
+                      <% } %>
+                    </td>
+                    <td class="text-right">
+                      <span class="badge badge-soft badge-success badge-sm">
+                        <%= (d.rate * 100).toFixed(0) %>%
+                      </span>
+                    </td>
+                    <td>
+                      <form action="/discounts/<%= d.id %>/delete" method="POST"
+                        onsubmit="return confirm('Delete this discount rule?')">
+                        <button type="submit" class="btn btn-ghost btn-xs text-error">Delete</button>
+                      </form>
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% } %>
+    </div>
+
+  </div>
+</div>

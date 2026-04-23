@@ -1,0 +1,272 @@
+<% title = 'Dashboard' %>
+
+<div class="text-center py-8">
+  <h1 class="text-4xl font-bold text-base-content mb-3">
+    Inventory & Point of Sale
+  </h1>
+  <p class="text-base-content/60 text-lg max-w-2xl mx-auto">
+    Manage products, process sales, apply dynamic discounts, and track your business — all in one place.
+  </p>
+  <% if (!locals.user) { %>
+    <div class="mt-6 flex gap-3 justify-center">
+      <a href="/login" class="btn btn-primary">Get Started</a>
+      <a href="/register" class="btn btn-outline">Create Account</a>
+    </div>
+  <% } else { %>
+    <div class="mt-6 flex gap-3 justify-center">
+      <a href="/pos" class="btn btn-primary">Open POS</a>
+      <a href="/products" class="btn btn-outline">View Products</a>
+    </div>
+  <% } %>
+</div>
+
+<% if (locals.user && stats && orderStats) { %>
+
+  <!-- Inventory stats row -->
+  <div class="py-4">
+    <p class="text-xs font-semibold uppercase tracking-widest text-base-content/40 mb-2">Inventory</p>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <div class="stat bg-base-100 rounded-2xl shadow-sm">
+        <div class="stat-figure text-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
+          </svg>
+        </div>
+        <div class="stat-title">Total Products</div>
+        <div class="stat-value text-primary"><%= stats.totalProducts %></div>
+        <div class="stat-desc"><%= stats.totalCategories %> categories</div>
+      </div>
+
+      <div class="stat bg-base-100 rounded-2xl shadow-sm">
+        <div class="stat-figure text-success">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="stat-title">Inventory Value</div>
+        <div class="stat-value text-success text-2xl"><%= formatCurrency(stats.totalValue) %></div>
+        <div class="stat-desc">Stock × price</div>
+      </div>
+
+      <div class="stat bg-base-100 rounded-2xl shadow-sm">
+        <div class="stat-figure text-warning">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div class="stat-title">Low Stock</div>
+        <div class="stat-value text-warning"><%= stats.lowStock %></div>
+        <div class="stat-desc">Below 10 units</div>
+      </div>
+
+      <div class="stat bg-base-100 rounded-2xl shadow-sm">
+        <div class="stat-figure text-error">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+          </svg>
+        </div>
+        <div class="stat-title">Out of Stock</div>
+        <div class="stat-value text-error"><%= stats.outOfStock %></div>
+        <div class="stat-desc">Need restocking</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Sales stats row -->
+  <div class="py-4">
+    <p class="text-xs font-semibold uppercase tracking-widest text-base-content/40 mb-2">Sales</p>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <div class="stat bg-base-100 rounded-2xl shadow-sm">
+        <div class="stat-figure text-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </div>
+        <div class="stat-title">Total Orders</div>
+        <div class="stat-value text-secondary"><%= orderStats.totalOrders %></div>
+        <div class="stat-desc">All time</div>
+      </div>
+
+      <div class="stat bg-base-100 rounded-2xl shadow-sm">
+        <div class="stat-figure text-accent">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <div class="stat-title">Total Revenue</div>
+        <div class="stat-value text-accent text-2xl"><%= formatCurrency(orderStats.totalRevenue) %></div>
+        <div class="stat-desc">After discounts + tax</div>
+      </div>
+
+      <div class="stat bg-base-100 rounded-2xl shadow-sm">
+        <div class="stat-figure text-info">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div class="stat-title">Orders Today</div>
+        <div class="stat-value text-info"><%= orderStats.todayOrders %></div>
+        <div class="stat-desc">Since midnight</div>
+      </div>
+
+      <div class="stat bg-base-100 rounded-2xl shadow-sm">
+        <div class="stat-figure text-success">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+        </div>
+        <div class="stat-title">Today's Revenue</div>
+        <div class="stat-value text-success text-2xl"><%= formatCurrency(orderStats.todayRevenue) %></div>
+        <div class="stat-desc">Since midnight</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom grid: category breakdown + recent orders -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 py-8">
+
+    <!-- Category breakdown -->
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title text-base mb-3">Category Breakdown</h2>
+        <div class="overflow-x-auto">
+          <table class="table table-zebra table-sm">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th class="text-right">Products</th>
+                <th class="text-right">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for (const cat of stats.categoryBreakdown) { %>
+                <tr>
+                  <td><span class="badge badge-outline badge-sm"><%= cat.category %></span></td>
+                  <td class="text-right"><%= cat.count %></td>
+                  <td class="text-right font-medium"><%= formatCurrency(cat.value) %></td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent orders -->
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="card-title text-base">Recent Orders</h2>
+          <a href="/pos/history" class="text-xs text-primary hover:underline">View all →</a>
+        </div>
+        <% if (recentOrders.length === 0) { %>
+          <p class="text-base-content/40 text-sm text-center py-8">No orders yet.</p>
+        <% } else { %>
+          <div class="overflow-x-auto">
+            <table class="table table-zebra table-sm">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Cashier</th>
+                  <th class="text-right">Items</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (const order of recentOrders) { %>
+                  <tr>
+                    <td>
+                      <p class="font-medium">#<%= order.id %></p>
+                      <p class="text-xs text-base-content/40">
+                        <%= new Date(order.createdAt).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) %>
+                      </p>
+                    </td>
+                    <td class="text-sm"><%= order.user.name %></td>
+                    <td class="text-right font-mono text-sm"><%= order.items.length %></td>
+                    <td class="text-right font-semibold text-primary"><%= formatCurrency(order.grandTotal) %></td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+  </div>
+
+<% } else if (!locals.user) { %>
+
+  <!-- Feature cards for guests -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="p-2 bg-primary/10 rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
+            </svg>
+          </div>
+          <h2 class="card-title">Inventory Management</h2>
+        </div>
+        <p class="text-base-content/60 text-sm">
+          Full CRUD for your product catalog with real-time stock tracking, category management, and low-stock alerts.
+        </p>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="p-2 bg-secondary/10 rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <h2 class="card-title">Point of Sale</h2>
+        </div>
+        <p class="text-base-content/60 text-sm">
+          Process sales with a cart-based POS terminal. Automatically applies product-level discount rules, calculates PPN tax, and records every order.
+        </p>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="p-2 bg-success/10 rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+          </div>
+          <h2 class="card-title">Dynamic Discounts</h2>
+        </div>
+        <p class="text-base-content/60 text-sm">
+          Define per-product discount rules with quantity and subtotal thresholds. Rules are evaluated at checkout with the best match applied automatically.
+        </p>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="p-2 bg-accent/10 rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h2 class="card-title">Sales Analytics</h2>
+        </div>
+        <p class="text-base-content/60 text-sm">
+          Dashboard with live inventory value, order totals, today's revenue, and a full order history with itemized receipts.
+        </p>
+      </div>
+    </div>
+
+  </div>
+<% } %>

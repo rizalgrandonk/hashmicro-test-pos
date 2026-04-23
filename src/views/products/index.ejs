@@ -1,0 +1,140 @@
+<%
+  title = 'Products'
+  fullHeight = true
+  const catParam = selectedCategory ? `&category=${selectedCategory}` : ''
+  const limitParam = `&limit=${pagination.limit}`
+  const startItem = pagination.total === 0 ? 0 : (pagination.page - 1) * pagination.limit + 1
+  const endItem = Math.min(pagination.page * pagination.limit, pagination.total)
+%>
+
+<div class="flex flex-col overflow-hidden px-6 py-5 gap-3" style="height: calc(100vh - 4rem)">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between shrink-0">
+    <div>
+      <h1 class="text-2xl font-bold">Products</h1>
+      <p class="text-base-content/60 text-sm mt-0.5"><%= pagination.total %> items found</p>
+    </div>
+    <a href="/products/create" class="btn btn-primary btn-sm gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Add Product
+    </a>
+  </div>
+
+  <!-- Category filter -->
+  <div class="flex gap-2 flex-wrap shrink-0">
+    <a href="/products?limit=<%= pagination.limit %>" class="badge <%= !selectedCategory ? 'badge-primary' : 'badge-outline' %> badge-lg cursor-pointer">All</a>
+    <% for (const cat of categories) { %>
+      <a href="/products?category=<%= cat %><%= limitParam %>" class="badge <%= selectedCategory === cat ? 'badge-primary' : 'badge-outline' %> badge-lg cursor-pointer"><%= cat %></a>
+    <% } %>
+  </div>
+
+  <!-- Table — fills remaining height, scrollable -->
+  <div class="flex-1 min-h-0">
+    <div class="card bg-base-100 shadow-sm h-full overflow-hidden">
+      <div class="overflow-auto h-full">
+        <table class="table table-zebra table-pin-rows">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>SKU</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th>Value</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (products.length === 0) { %>
+              <tr>
+                <td colspan="8" class="text-center text-base-content/50 py-12">
+                  No products found.
+                  <a href="/products/create" class="text-primary hover:underline">Add one?</a>
+                </td>
+              </tr>
+            <% } %>
+            <% for (const product of products) { %>
+              <tr>
+                <td class="font-medium"><%= product.name %></td>
+                <td class="font-mono text-sm text-base-content/60"><%= product.sku %></td>
+                <td><span class="badge badge-outline badge-sm"><%= product.category %></span></td>
+                <td><%= formatCurrency(product.price) %></td>
+                <td><%= product.stock %></td>
+                <td>
+                  <% if (product.stockStatus === 'out') { %>
+                    <span class="badge badge-soft badge-error badge-sm">Out of Stock</span>
+                  <% } else if (product.stockStatus === 'low') { %>
+                    <span class="badge badge-soft badge-warning badge-sm">Low Stock</span>
+                  <% } else if (product.stockStatus === 'high') { %>
+                    <span class="badge badge-soft badge-info badge-sm">High Stock</span>
+                  <% } else { %>
+                    <span class="badge badge-soft badge-success badge-sm">In Stock</span>
+                  <% } %>
+                </td>
+                <td class="font-medium"><%= formatCurrency(product.price * product.stock) %></td>
+                <td>
+                  <div class="flex gap-1">
+                    <a href="/products/<%= product.id %>/edit" class="btn btn-ghost btn-xs">Edit</a>
+                    <form action="/products/<%= product.id %>/delete" method="POST"
+                      onsubmit="return confirm('Delete <%= product.name %>?')">
+                      <button type="submit" class="btn btn-ghost btn-xs text-error">Delete</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination footer — pinned to bottom -->
+  <div class="flex items-center justify-between shrink-0">
+    <p class="text-sm text-base-content/60">
+      <% if (pagination.total === 0) { %>
+        No products
+      <% } else { %>
+        Showing <%= startItem %>–<%= endItem %> of <%= pagination.total %>
+      <% } %>
+    </p>
+
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2 text-sm text-base-content/60">
+        Rows per page:
+        <select class="select select-sm select-bordered w-20" onchange="changeLimit(this.value)">
+          <% for (const opt of [15, 25, 50]) { %>
+            <option value="<%= opt %>" <%= pagination.limit === opt ? 'selected' : '' %>><%= opt %></option>
+          <% } %>
+        </select>
+      </div>
+
+      <% if (pagination.totalPages > 1) { %>
+        <div class="join">
+          <a href="/products?page=<%= pagination.page - 1 %><%= catParam %><%= limitParam %>"
+            class="join-item btn btn-sm <%= pagination.page <= 1 ? 'btn-disabled' : '' %>">«</a>
+          <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+            <a href="/products?page=<%= i %><%= catParam %><%= limitParam %>"
+              class="join-item btn btn-sm <%= pagination.page === i ? 'btn-primary' : '' %>"><%= i %></a>
+          <% } %>
+          <a href="/products?page=<%= pagination.page + 1 %><%= catParam %><%= limitParam %>"
+            class="join-item btn btn-sm <%= pagination.page >= pagination.totalPages ? 'btn-disabled' : '' %>">»</a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function changeLimit(val) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('limit', val);
+  url.searchParams.set('page', '1');
+  window.location.href = url.toString();
+}
+</script>

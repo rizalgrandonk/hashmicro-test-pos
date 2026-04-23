@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+  root: ":root";
+  include: ;
+  exclude: ;
+  prefix: ;
+  logs: true;
+}
+
+/* override default primary color */
+:root {
+  --color-primary: #3f60e5;
+  --color-primary-content: #e9eeff;
+}

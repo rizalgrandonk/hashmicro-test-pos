@@ -1,0 +1,128 @@
+<%
+  title = 'Order History'
+%>
+
+<div class="py-8 px-4">
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold">Order History</h1>
+      <p class="text-base-content/60 text-sm mt-0.5"><%= orders.length %> orders total</p>
+    </div>
+    <a href="/pos" class="btn btn-primary btn-sm gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      New Sale
+    </a>
+  </div>
+
+  <% if (orders.length === 0) { %>
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body items-center text-center py-16">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-base-content/20 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <p class="text-base-content/40">No orders yet.</p>
+        <a href="/pos" class="btn btn-primary btn-sm mt-4">Make the first sale</a>
+      </div>
+    </div>
+  <% } else { %>
+
+    <div class="flex flex-col gap-4">
+      <% for (const order of orders) { %>
+        <div class="card bg-base-100 shadow-sm">
+          <div class="card-body p-0">
+
+            <!-- Order summary row -->
+            <div class="flex items-center justify-between px-5 py-4 border-b border-base-200">
+              <div class="flex items-center gap-4">
+                <div>
+                  <p class="font-bold">Order #<%= order.id %></p>
+                  <p class="text-xs text-base-content/50">
+                    <%= new Date(order.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %>
+                    &mdash; <%= order.user.name %>
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-6 text-right">
+                <div>
+                  <p class="text-xs text-base-content/50">Grand Total</p>
+                  <p class="font-bold text-primary"><%= formatCurrency(order.grandTotal) %></p>
+                </div>
+                <div>
+                  <p class="text-xs text-base-content/50">Payment</p>
+                  <p class="font-semibold"><%= formatCurrency(order.payment) %></p>
+                </div>
+                <div>
+                  <p class="text-xs text-base-content/50">Change</p>
+                  <p class="font-semibold"><%= formatCurrency(order.change) %></p>
+                </div>
+                <div>
+                  <p class="text-xs text-base-content/50">Items</p>
+                  <p class="font-semibold"><%= order.items.length %></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Order line items -->
+            <div class="overflow-x-auto">
+              <table class="table table-sm">
+                <thead>
+                  <tr class="text-base-content/50">
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th class="text-right">Qty</th>
+                    <th class="text-right">Unit Price</th>
+                    <th class="text-right">Subtotal</th>
+                    <th>Discount</th>
+                    <th class="text-right">Net Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% for (const item of order.items) { %>
+                    <tr>
+                      <td>
+                        <p class="font-medium text-sm"><%= item.productName %></p>
+                        <p class="font-mono text-xs text-base-content/40"><%= item.productSku %></p>
+                      </td>
+                      <td><span class="badge badge-outline badge-xs"><%= item.category %></span></td>
+                      <td class="text-right font-mono text-sm"><%= item.quantity %></td>
+                      <td class="text-right text-sm"><%= formatCurrency(item.unitPrice) %></td>
+                      <td class="text-right text-sm"><%= formatCurrency(item.subtotal) %></td>
+                      <td>
+                        <% if (item.discountRate > 0) { %>
+                          <span class="badge badge-soft badge-success badge-xs"><%= (item.discountRate * 100).toFixed(0) %>%</span>
+                          <p class="text-xs text-base-content/40 mt-0.5"><%= item.discountRule %></p>
+                        <% } else { %>
+                          <span class="text-base-content/30 text-xs">—</span>
+                        <% } %>
+                      </td>
+                      <td class="text-right font-semibold text-sm"><%= formatCurrency(item.netAmount) %></td>
+                    </tr>
+                  <% } %>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="6" class="text-right text-xs text-base-content/50">Total Net</td>
+                    <td class="text-right text-sm font-semibold"><%= formatCurrency(order.totalNet) %></td>
+                  </tr>
+                  <tr>
+                    <td colspan="6" class="text-right text-xs text-base-content/50">PPN 11%</td>
+                    <td class="text-right text-sm"><%= formatCurrency(order.taxAmount) %></td>
+                  </tr>
+                  <tr>
+                    <td colspan="6" class="text-right text-sm font-bold">Grand Total</td>
+                    <td class="text-right font-bold text-primary"><%= formatCurrency(order.grandTotal) %></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      <% } %>
+    </div>
+
+  <% } %>
+</div>

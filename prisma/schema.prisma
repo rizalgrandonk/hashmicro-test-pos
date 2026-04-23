@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  userId     Int
+  user       User        @relation(fields: [userId], references: [id])
+  totalNet   Float
+  taxAmount  Float
+  grandTotal Float
+  payment    Float
+  change     Float
+  createdAt  DateTime    @default(now())
+  items      OrderItem[]
+}
+
+model OrderItem {
+  id             Int    @id @default(autoincrement())
+  orderId        Int
+  order          Order  @relation(fields: [orderId], references: [id])
+  productId      Int
+  productName    String
+  productSku     String
+  category       String
+  unitPrice      Float
+  quantity       Int
+  subtotal       Float
+  discountRule   String
+  discountRate   Float
+  discountAmount Float
+  netAmount      Float
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  name        String
+  sku         String     @unique
+  category    String
+  price       Float
+  stock       Int
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  discounts   Discount[]
+}
+
+model Discount {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label       String
+  minQuantity Int      @default(1)
+  minSubtotal Float    @default(0)
+  rate        Float
+  createdAt   DateTime @default(now())
+}
