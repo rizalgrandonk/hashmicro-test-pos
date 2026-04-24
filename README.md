@@ -4,6 +4,12 @@ A web-based Point of Sale (POS) and inventory management system built with Expre
 
 ---
 
+## Live Demo
+
+Demo URL : [https://hashmicrotest.rizalgrandonk.my.id/](https://hashmicrotest.rizalgrandonk.my.id/)
+
+---
+
 ## Getting Started
 
 ### Prerequisites
