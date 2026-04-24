@@ -4,7 +4,7 @@ export default defineConfig({
   entry: ["src/app.ts"],
   format: ["esm"],
   outDir: "dist",
-  target: "es2022",
+  target: "es2020",
   clean: true,
   sourcemap: false,
   dts: false,
