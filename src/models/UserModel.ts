@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { BaseModel } from "./BaseModel";
 import { User } from "../generated/prisma/client";
 

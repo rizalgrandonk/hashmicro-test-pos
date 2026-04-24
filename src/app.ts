@@ -28,11 +28,11 @@ app.set("layout", "layouts/main");
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "dev-secret-change-in-prod",
+    secret: process.env.SESSION_SECRET || "dev-secret",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
+      secure: false, // Set to true if using HTTPS
       maxAge: 1000 * 60 * 60 * 24, // 24 hours
     },
   }),
