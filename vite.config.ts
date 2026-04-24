@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
 import path from "node:path";
 
+const isWatch = process.argv.includes("--watch");
+
 export default defineConfig({
   build: {
     outDir: "src/public/css",
@@ -11,8 +13,6 @@ export default defineConfig({
         assetFileNames: "style.css",
       },
     },
-    watch: {
-      exclude: ["src/public/**"],
-    },
+    watch: isWatch ? { exclude: ["src/public/**"] } : null,
   },
 });
