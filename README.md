@@ -8,7 +8,7 @@ A web-based Point of Sale (POS) and inventory management system built with Expre
 
 ### Prerequisites
 
-- Node.js >= 20
+- Node.js >= 22
 - PostgreSQL >= 14
 - npm
 
@@ -30,19 +30,18 @@ SESSION_SECRET=your-secret-here
 DATABASE_URL="postgresql://<user>:<password>@localhost:5432/<dbname>"
 ```
 
-### 3. Provision a PostgreSQL database
+Adjust `DATABASE_URL` to point to an existing database and user.
 
-```sql
-CREATE USER hashmicro_test WITH PASSWORD 'hashmicro_test';
-CREATE DATABASE hashmicro_test OWNER hashmicro_test;
-```
-
-Or adjust `DATABASE_URL` to point to an existing database and user.
-
-### 4. Run migrations
+### 3. Run migrations
 
 ```bash
 npm run db:migrate
+```
+
+### 4. Generate prisma client
+
+```bash
+npx prisma generate
 ```
 
 ### 5. Seed the database
