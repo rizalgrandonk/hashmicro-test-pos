@@ -16,7 +16,7 @@ A web-based Point of Sale (POS) and inventory management system built with Expre
 
 ```bash
 git clone https://github.com/rizalgrandonk/hashmicro-test-pos.git
-cd hashmicro-test
+cd hashmicro-test-pos
 npm install
 ```
 
